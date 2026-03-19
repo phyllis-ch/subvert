@@ -4,12 +4,11 @@
 #include <unistd.h>
 
 char line[1024];
-int h, m;
-float s;
-char opt;
-char *file_lrc = NULL;
 
 void vtt_to_lrc(FILE *in, FILE *out) {
+   int h, m;
+   float s;
+
    while (fgets(line, sizeof(line), in)) {
       if (strncmp(line, "WEBVTT", 6) == 0) {
          fgets(line, sizeof(line), in);
@@ -32,6 +31,9 @@ void vtt_to_lrc(FILE *in, FILE *out) {
 
 int main(int argc, char *argv[])
 {
+   char opt;
+   char *file_lrc = NULL;
+
    if (argc == 1) {
       fprintf(stderr, "Missing options and arguments\n");
       fprintf(stderr, "Usage: %s [-o] <file>\n", argv[0]);
