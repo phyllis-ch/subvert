@@ -3,14 +3,35 @@
 #include <string.h>
 #include <unistd.h>
 
+char line[1024];
+int h, m;
+float s;
+char opt;
+char *file_lrc = NULL;
+
+void vtt_to_lrc(FILE *in, FILE *out) {
+   while (fgets(line, sizeof(line), in)) {
+      if (strncmp(line, "WEBVTT", 6) == 0) {
+         fgets(line, sizeof(line), in);
+         continue;
+      }
+      if (isdigit(line[0]) && !strchr(line, ':')) continue;
+
+      if (strstr(line, "-->")) {
+         // fprintf(stdout, "Before: %s", line);
+         sscanf(line, "%d:%d:%f", &h, &m, &s);
+         // fprintf(stdout, "After: [%d:%d:%.2f]\n", h, m, s);
+
+         int m_total = (h * 60) + m;
+         fprintf(out, "[%02d:%.2f]", m_total, s);
+      } else {
+         fprintf(out, "%s", line);
+      }
+   }
+}
+
 int main(int argc, char *argv[])
 {
-   char opt;
-   char line[1024];
-   int h, m;
-   float s;
-   char *file_lrc = NULL;
-
    if (argc == 1) {
       fprintf(stderr, "Missing options and arguments\n");
       fprintf(stderr, "Usage: %s [-o] <file>\n", argv[0]);
@@ -50,24 +71,7 @@ int main(int argc, char *argv[])
    FILE *file_out = fopen(file_lrc, "w");
 
    // Translating
-   while (fgets(line, sizeof(line), file_in)) {
-      if (strncmp(line, "WEBVTT", 6) == 0) {
-         fgets(line, sizeof(line), file_in);
-         continue;
-      }
-      if (isdigit(line[0]) && !strchr(line, ':')) continue;
-
-      if (strstr(line, "-->")) {
-         // fprintf(stdout, "Before: %s", line);
-         sscanf(line, "%d:%d:%f", &h, &m, &s);
-         // fprintf(stdout, "After: [%d:%d:%.2f]\n", h, m, s);
-
-         int m_total = (h * 60) + m;
-         fprintf(file_out, "[%02d:%.2f]", m_total, s);
-      } else {
-         fprintf(file_out, "%s", line);
-      }
-   }
+   vtt_to_lrc(file_in, file_out);
 
    fclose(file_in);
    fclose(file_out);
