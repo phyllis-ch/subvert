@@ -1,26 +1,55 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <unistd.h>
 
 int main(int argc, char *argv[])
 {
-   if (argc < 2) {
-      fprintf(stderr, "Usage: %s <file>\n", argv[0]);
-      return 1;
-   }
-
-   const char *file_vtt = argv[1];
-   FILE *file_in = fopen(file_vtt, "r");
-   if (!file_in) {
-      fprintf(stderr, "Filenme %s is not valid\n", file_vtt);
-      return 69;
-   }
-   FILE *file_out = fopen("./out.lrc", "w");
-
+   char opt;
    char line[1024];
    int h, m;
    float s;
+   char *file_lrc = NULL;
 
+   if (argc == 1) {
+      fprintf(stderr, "Missing options and arguments\n");
+      fprintf(stderr, "Usage: %s [-o] <file>\n", argv[0]);
+      return 69;
+   }
+
+   opterr = 0;
+   while ((opt = getopt(argc, argv, "o:h")) != -1) {
+      switch (opt) {
+         case 'o':
+            file_lrc = optarg;
+            break;
+         case 'h':
+            fprintf(stdout, "Usage: %s [-o] <file>\n", argv[0]);
+            return -1;
+         default:
+            if (optopt == 'o') {
+               fprintf(stderr, "Error: -o requires an argument\n");
+            } else {
+               fprintf(stderr, "Unknown option '%c'\n", optopt);
+               fprintf(stderr, "Usage: %s [-o output] file\n", argv[0]);
+            }
+            return 2;
+      }
+   }
+
+   if (optind >= argc) {
+      fprintf(stderr, "Error: Missing input file\n");
+      return 1;
+   }
+   const char *file_vtt = argv[optind];
+   FILE *file_in = fopen(file_vtt, "r");
+   if (!file_in) {
+      fprintf(stderr, "Filenme %s is invalid\n", file_vtt);
+      return 2;
+   }
+   FILE *file_out = fopen(file_lrc, "w");
+
+   // Translating
    while (fgets(line, sizeof(line), file_in)) {
       if (strncmp(line, "WEBVTT", 6) == 0) {
          fgets(line, sizeof(line), file_in);
