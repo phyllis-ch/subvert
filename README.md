@@ -3,7 +3,7 @@ As in **Sub**title con**Vert**er
 
 ## Build
 ```
-cc -o subvert main.c
+./build.sh
 ```
 
 ## Usage
