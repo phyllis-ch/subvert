@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
 {
    char opt;
    char *file_lrc = NULL;
+   FILE *file_out;
 
    if (argc == 1) {
       fprintf(stderr, "Missing options and arguments\n");
@@ -70,9 +71,9 @@ int main(int argc, char *argv[])
       fprintf(stderr, "Filenme %s is invalid\n", file_vtt);
       return 2;
    }
-   FILE *file_out = fopen(file_lrc, "w");
+   if (!file_lrc) file_out = fopen("./out.lrc", "w");
+   else file_out = fopen(file_lrc, "w");
 
-   // Translating
    vtt_to_lrc(file_in, file_out);
 
    fclose(file_in);
