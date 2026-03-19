@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
       return 69;
    }
 
+   // TODO: remove getopt and just parse flags manually
    opterr = 0;
    while ((opt = getopt(argc, argv, "o:h")) != -1) {
       switch (opt) {
@@ -71,8 +72,16 @@ int main(int argc, char *argv[])
       fprintf(stderr, "Filenme %s is invalid\n", file_vtt);
       return 2;
    }
-   if (!file_lrc) file_out = fopen("./out.lrc", "w");
-   else file_out = fopen(file_lrc, "w");
+
+   char buf[256];
+   if (!file_lrc) {
+      strcpy(buf, file_vtt);
+      file_lrc = strrchr(buf, '/') + 1;
+      char *dot = strrchr(file_lrc, '.');
+      *dot = '\0';
+      strncat(file_lrc, ".lrc", 5);
+   }
+   file_out = fopen(file_lrc, "w");
 
    vtt_to_lrc(file_in, file_out);
 
