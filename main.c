@@ -29,6 +29,32 @@ void vtt_to_lrc(FILE *in, FILE *out) {
    }
 }
 
+void vtt_to_srt(FILE *in, FILE *out) {
+   while (fgets(line, sizeof(line), in)) {
+      if (strncmp(line, "WEBVTT", 6) == 0) {
+         fgets(line, sizeof(line), in);
+         continue;
+      }
+
+      if (strstr(line, "-->")) {
+         fprintf(stdout, "%s", line);
+         char *line_ptr = NULL;
+         for (int i = 0; i < 2; ++i) {
+            line_ptr = strchr(line, '.');
+            *line_ptr = ',';
+            fprintf(stdout, "%s\n", line_ptr);
+            fprintf(stdout, "%s\n", line);
+         }
+         // sscanf(line, "%d:%d:%f", &h, &m, &s);
+
+         // int m_total = (h * 60) + m;
+         // fprintf(file_out, "[%02d:%.2f]", m_total, s);
+      }
+      fprintf(out, "%s", line);
+   }
+}
+
+
 int main(int argc, char *argv[])
 {
    char opt;
@@ -69,7 +95,7 @@ int main(int argc, char *argv[])
    const char *file_vtt = argv[optind];
    FILE *file_in = fopen(file_vtt, "r");
    if (!file_in) {
-      fprintf(stderr, "Filenme %s is invalid\n", file_vtt);
+      fprintf(stderr, "Error: filenme %s cannot be opened\n", file_vtt);
       return 2;
    }
 
@@ -84,6 +110,7 @@ int main(int argc, char *argv[])
    file_out = fopen(file_lrc, "w");
 
    vtt_to_lrc(file_in, file_out);
+   // vtt_to_srt(file_in, file_out);
 
    fclose(file_in);
    fclose(file_out);
