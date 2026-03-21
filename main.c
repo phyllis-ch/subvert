@@ -57,7 +57,6 @@ void vtt_to_srt(FILE *in, FILE *out) {
 
 int main(int argc, char *argv[])
 {
-   char opt;
    char *file_lrc = NULL;
    const char *file_vtt = NULL;
 
