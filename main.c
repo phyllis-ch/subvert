@@ -1,8 +1,54 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
 char line[1024];
+const char *filename_output = NULL;
+char *filename_input = NULL;
+
+void get_flags(int argc, char *argv[]) {
+   if (argc < 2) {
+      fprintf(stderr, "Usage: %s [-o output] <file>\n", argv[0]);
+      fprintf(stderr, "Missing options and arguments\n");
+      exit(69);
+   }
+
+   for (int i = 1; i < argc; ++i) {
+      if (strcmp(argv[i], "-o") == 0) {
+         if (i + 1 >= argc) {
+            fprintf(stderr, "Error: -o requires an argument\n");
+            exit(1);
+         }
+         filename_output = argv[++i];
+         continue;
+      }
+
+      if (strcmp(argv[i], "-h") == 0) {
+         fprintf(stdout, "Usage: %s [-o output] <file>\n", argv[0]);
+         exit(0);
+      }
+
+      if (strcmp(argv[i], "--") == 0) {
+         filename_input = argv[++i];
+         break;
+      }
+
+      if (strcmp(argv[i], "-") == 0) {
+         fprintf(stderr, "Usage: %s [-o output] <file>\n", argv[0]);
+         fprintf(stderr, "Error: No option specified\n");
+         exit(1);
+      }
+
+      if (argv[i][0] == '-' && argv[i][1] != '\0') {
+         fprintf(stderr, "Usage: %s [-o output] file\n", argv[0]);
+         fprintf(stderr, "Unknown option '%c'\n", argv[i][1]);
+         exit(2);
+      }
+
+      filename_input = argv[i];
+   }
+}
 
 void vtt_to_lrc(FILE *in, FILE *out) {
    int h, m;
@@ -56,49 +102,7 @@ void vtt_to_srt(FILE *in, FILE *out) {
 
 int main(int argc, char *argv[])
 {
-   char *filename_input = NULL;
-   const char *filename_output = NULL;
-
-   if (argc < 2) {
-      fprintf(stderr, "Usage: %s [-o output] <file>\n", argv[0]);
-      fprintf(stderr, "Missing options and arguments\n");
-      return 69;
-   }
-
-   for (int i = 1; i < argc; ++i) {
-      if (strcmp(argv[i], "-o") == 0) {
-         if (i + 1 >= argc) {
-            fprintf(stderr, "Error: -o requires an argument\n");
-            return 1;
-         }
-         filename_output = argv[++i];
-         continue;
-      }
-
-      if (strcmp(argv[i], "-h") == 0) {
-         fprintf(stdout, "Usage: %s [-o output] <file>\n", argv[0]);
-         return 0;
-      }
-
-      if (strcmp(argv[i], "--") == 0) {
-         filename_input = argv[++i];
-         break;
-      }
-
-      if (strcmp(argv[i], "-") == 0) {
-         fprintf(stderr, "Usage: %s [-o output] <file>\n", argv[0]);
-         fprintf(stderr, "Error: No option specified\n");
-         return 1;
-      }
-
-      if (argv[i][0] == '-' && argv[i][1] != '\0') {
-         fprintf(stderr, "Usage: %s [-o output] file\n", argv[0]);
-         fprintf(stderr, "Unknown option '%c'\n", argv[i][1]);
-         return 2;
-      }
-
-      filename_input = argv[i];
-   }
+   get_flags(argc, argv);
 
    if (!filename_input) {
       fprintf(stderr, "Error: Missing input file\n");
