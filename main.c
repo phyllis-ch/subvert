@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#include <unistd.h>
 
 char line[1024];
 
@@ -66,18 +65,14 @@ int main(int argc, char *argv[])
       return 69;
    }
 
-   for (int i = 1; i < argc; i++) {
+   int i = 0;
+   for (i = 1; i < argc; ++i) {
       if (strcmp(argv[i], "-o") == 0) {
-         // ./subvert -o ./test.lrc
-         //  1         2   3
          if (i + 1 >= argc) {
             fprintf(stderr, "Error: -o requires an argument\n");
             return 1;
          }
-         printf("%d\n", i);
          file_lrc = argv[++i];
-         printf("%s\n", file_lrc);
-         printf("%d\n", i);
          continue;
       }
 
@@ -106,11 +101,10 @@ int main(int argc, char *argv[])
       file_vtt = argv[i];
    }
 
-   if (optind >= argc) {
+   if (!file_vtt) {
       fprintf(stderr, "Error: Missing input file\n");
       return 1;
    }
-   // const char *file_vtt = argv[optind];
    FILE *file_in = fopen(file_vtt, "r");
    if (!file_in) {
       fprintf(stderr, "Error: filenme %s cannot be opened\n", file_vtt);
