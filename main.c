@@ -56,8 +56,8 @@ void vtt_to_srt(FILE *in, FILE *out) {
 
 int main(int argc, char *argv[])
 {
-   char *file_lrc = NULL;
-   const char *file_vtt = NULL;
+   char *filename_input = NULL;
+   const char *filename_output = NULL;
 
    if (argc < 2) {
       fprintf(stderr, "Usage: %s [-o output] <file>\n", argv[0]);
@@ -65,14 +65,13 @@ int main(int argc, char *argv[])
       return 69;
    }
 
-   int i = 0;
-   for (i = 1; i < argc; ++i) {
+   for (int i = 1; i < argc; ++i) {
       if (strcmp(argv[i], "-o") == 0) {
          if (i + 1 >= argc) {
             fprintf(stderr, "Error: -o requires an argument\n");
             return 1;
          }
-         file_lrc = argv[++i];
+         filename_output = argv[++i];
          continue;
       }
 
@@ -82,7 +81,7 @@ int main(int argc, char *argv[])
       }
 
       if (strcmp(argv[i], "--") == 0) {
-         file_vtt = argv[++i];
+         filename_input = argv[++i];
          break;
       }
 
@@ -98,34 +97,35 @@ int main(int argc, char *argv[])
          return 2;
       }
 
-      file_vtt = argv[i];
+      filename_input = argv[i];
    }
 
-   if (!file_vtt) {
+   if (!filename_input) {
       fprintf(stderr, "Error: Missing input file\n");
-      return 1;
+      return 2;
    }
-   FILE *file_in = fopen(file_vtt, "r");
-   if (!file_in) {
-      fprintf(stderr, "Error: filenme %s cannot be opened\n", file_vtt);
+
+   FILE *f_input = fopen(filename_input, "r");
+   if (!f_input) {
+      fprintf(stderr, "Error: filenme %s cannot be opened\n", filename_input);
       return 2;
    }
 
    char buf[256];
-   if (!file_lrc) {
-      strcpy(buf, file_vtt);
-      file_lrc = strrchr(buf, '/') + 1;
-      char *dot = strrchr(file_lrc, '.');
+   if (!filename_output) {
+      strcpy(buf, filename_input);
+      filename_output = strrchr(buf, '/') + 1;
+      char *dot = strrchr(buf, '.');
       *dot = '\0';
-      strncat(file_lrc, ".lrc", 5);
+      strncat(buf, ".lrc", 5);
    }
-   FILE *file_out = fopen(file_lrc, "w");
+   FILE *f_output = fopen(filename_output, "w");
 
-   vtt_to_lrc(file_in, file_out);
+   vtt_to_lrc(f_input, f_output);
    // vtt_to_srt(file_in, file_out);
 
-   fclose(file_in);
-   fclose(file_out);
+   fclose(f_input);
+   fclose(f_output);
 
    return 0;
 }
