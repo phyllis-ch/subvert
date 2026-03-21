@@ -59,40 +59,59 @@ int main(int argc, char *argv[])
 {
    char opt;
    char *file_lrc = NULL;
-   FILE *file_out;
+   const char *file_vtt = NULL;
 
-   if (argc == 1) {
+   if (argc < 2) {
+      fprintf(stderr, "Usage: %s [-o output] <file>\n", argv[0]);
       fprintf(stderr, "Missing options and arguments\n");
-      fprintf(stderr, "Usage: %s [-o] <file>\n", argv[0]);
       return 69;
    }
 
-   // TODO: remove getopt and just parse flags manually
-   opterr = 0;
-   while ((opt = getopt(argc, argv, "o:h")) != -1) {
-      switch (opt) {
-         case 'o':
-            file_lrc = optarg;
-            break;
-         case 'h':
-            fprintf(stdout, "Usage: %s [-o] <file>\n", argv[0]);
-            return -1;
-         default:
-            if (optopt == 'o') {
-               fprintf(stderr, "Error: -o requires an argument\n");
-            } else {
-               fprintf(stderr, "Unknown option '%c'\n", optopt);
-               fprintf(stderr, "Usage: %s [-o output] file\n", argv[0]);
-            }
-            return 2;
+   for (int i = 1; i < argc; i++) {
+      if (strcmp(argv[i], "-o") == 0) {
+         // ./subvert -o ./test.lrc
+         //  1         2   3
+         if (i + 1 >= argc) {
+            fprintf(stderr, "Error: -o requires an argument\n");
+            return 1;
+         }
+         printf("%d\n", i);
+         file_lrc = argv[++i];
+         printf("%s\n", file_lrc);
+         printf("%d\n", i);
+         continue;
       }
+
+      if (strcmp(argv[i], "-h") == 0) {
+         fprintf(stdout, "Usage: %s [-o output] <file>\n", argv[0]);
+         return 0;
+      }
+
+      if (strcmp(argv[i], "--") == 0) {
+         file_vtt = argv[++i];
+         break;
+      }
+
+      if (strcmp(argv[i], "-") == 0) {
+         fprintf(stderr, "Usage: %s [-o output] <file>\n", argv[0]);
+         fprintf(stderr, "Error: No option specified\n");
+         return 1;
+      }
+
+      if (argv[i][0] == '-' && argv[i][1] != '\0') {
+         fprintf(stderr, "Usage: %s [-o output] file\n", argv[0]);
+         fprintf(stderr, "Unknown option '%c'\n", argv[i][1]);
+         return 2;
+      }
+
+      file_vtt = argv[i];
    }
 
    if (optind >= argc) {
       fprintf(stderr, "Error: Missing input file\n");
       return 1;
    }
-   const char *file_vtt = argv[optind];
+   // const char *file_vtt = argv[optind];
    FILE *file_in = fopen(file_vtt, "r");
    if (!file_in) {
       fprintf(stderr, "Error: filenme %s cannot be opened\n", file_vtt);
@@ -107,7 +126,7 @@ int main(int argc, char *argv[])
       *dot = '\0';
       strncat(file_lrc, ".lrc", 5);
    }
-   file_out = fopen(file_lrc, "w");
+   FILE *file_out = fopen(file_lrc, "w");
 
    vtt_to_lrc(file_in, file_out);
    // vtt_to_srt(file_in, file_out);
