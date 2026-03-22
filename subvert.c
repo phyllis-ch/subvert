@@ -1,11 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include "subvert.h"
 
 const char *filename_output = NULL;
 char *filename_input = NULL;
 char line[1024];
+
 
 void get_flags(int argc, char *argv[]) {
    if (argc < 2) {
@@ -21,6 +19,12 @@ void get_flags(int argc, char *argv[]) {
             exit(1);
          }
          filename_output = argv[++i];
+         continue;
+      }
+
+      if (strcmp(argv[i], "-of") == 0) {
+         if (strcmp(argv[i + 1], "lrc") == 0) translate = &vtt_to_lrc;
+         ++i;
          continue;
       }
 
@@ -113,7 +117,7 @@ int main(int argc, char *argv[])
 
    FILE *f_input = fopen(filename_input, "r");
    if (!f_input) {
-      fprintf(stderr, "Error: filenme %s cannot be opened\n", filename_input);
+      fprintf(stderr, "Error: filename %s cannot be opened\n", filename_input);
       return 2;
    }
 
@@ -127,8 +131,10 @@ int main(int argc, char *argv[])
    }
    FILE *f_output = fopen(filename_output, "w");
 
-   vtt_to_lrc(f_input, f_output);
-   // vtt_to_srt(file_in, file_out);
+   if (!translate) {
+      translate = &vtt_to_lrc;
+   }
+   translate(f_input, f_output);
 
    fclose(f_input);
    fclose(f_output);
