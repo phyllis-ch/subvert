@@ -13,7 +13,7 @@ void get_flags(int argc, char *argv[]) {
    }
 
    for (int i = 1; i < argc; ++i) {
-      if (strcmp(argv[i], "-o") == 0) {
+      if (!strcmp(argv[i], "-o")) {
          if (i + 1 >= argc) {
             fprintf(stderr, "Error: -o requires an argument\n");
             exit(1);
@@ -22,23 +22,23 @@ void get_flags(int argc, char *argv[]) {
          continue;
       }
 
-      if (strcmp(argv[i], "-of") == 0) {
+      if (!strcmp(argv[i], "-of")) {
          if (strcmp(argv[i + 1], "lrc") == 0) translate = &vtt_to_lrc;
          ++i;
          continue;
       }
 
-      if (strcmp(argv[i], "-h") == 0) {
+      if (!strcmp(argv[i], "-h")) {
          fprintf(stdout, "Usage: %s [-o output] <file>\n", argv[0]);
          exit(0);
       }
 
-      if (strcmp(argv[i], "--") == 0) {
+      if (!strcmp(argv[i], "--")) {
          filename_input = argv[++i];
          break;
       }
 
-      if (strcmp(argv[i], "-") == 0) {
+      if (!strcmp(argv[i], "-")) {
          fprintf(stderr, "Usage: %s [-o output] <file>\n", argv[0]);
          fprintf(stderr, "Error: No option specified\n");
          exit(1);
