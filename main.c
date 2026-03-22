@@ -1,11 +1,11 @@
 #include <stdio.h>
-#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
-char line[1024];
 const char *filename_output = NULL;
 char *filename_input = NULL;
+char line[1024];
 
 void get_flags(int argc, char *argv[]) {
    if (argc < 2) {
@@ -62,8 +62,10 @@ void vtt_to_lrc(FILE *in, FILE *out) {
       if (isdigit(line[0]) && !strchr(line, ':')) continue;
 
       if (strstr(line, "-->")) {
-         // fprintf(stdout, "Before: %s", line);
-         sscanf(line, "%d:%d:%f", &h, &m, &s);
+         if (sscanf(line, "%d:%d:%f", &h, &m, &s) != 3) {
+            h = 0;
+            sscanf(line, "%d:%f", &m, &s);
+         }
          // fprintf(stdout, "After: [%d:%d:%.2f]\n", h, m, s);
 
          int m_total = (h * 60) + m;
