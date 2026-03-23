@@ -24,6 +24,8 @@ void get_flags(int argc, char *argv[]) {
 
       if (!strcmp(argv[i], "-of")) {
          if (strcmp(argv[i + 1], "lrc") == 0) translate = &vtt_to_lrc;
+         if (strcmp(argv[i + 1], "vtt") == 0) translate = &srt_to_vtt;
+         if (strcmp(argv[i + 1], "srt") == 0) translate = &vtt_to_srt;
          ++i;
          continue;
       }
@@ -105,6 +107,22 @@ void vtt_to_srt(FILE *in, FILE *out) {
    }
 }
 
+void srt_to_vtt(FILE *in, FILE *out) {
+   fprintf(out, "WEBVTT\n\n");
+   while (fgets(line, sizeof(line), in)) {
+      line[strcspn(line, "\r\n")] = '\0';
+
+      if (strstr(line, "-->")) {
+         char *line_ptr = NULL;
+         for (int i = 0; i < 2; ++i) {
+            line_ptr = strchr(line, ',');
+            *line_ptr = '.';
+         }
+      }
+      fprintf(out, "%s\n", line);
+   }
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -135,6 +153,7 @@ int main(int argc, char *argv[])
       translate = &vtt_to_lrc;
    }
    translate(f_input, f_output);
+
 
    fclose(f_input);
    fclose(f_output);
