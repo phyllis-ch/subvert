@@ -1,6 +1,7 @@
 #include "subvert.h"
 
 const char *filename_output = NULL;
+const char *extension = NULL;
 char *filename_input = NULL;
 char line[1024];
 char buf[256];
@@ -27,6 +28,7 @@ void get_flags(int argc, char *argv[]) {
          if (strcmp(argv[i + 1], "lrc") == 0) translate = &vtt_to_lrc;
          if (strcmp(argv[i + 1], "vtt") == 0) translate = &srt_to_vtt;
          if (strcmp(argv[i + 1], "srt") == 0) translate = &vtt_to_srt;
+         extension = argv[i + 1];
          ++i;
          continue;
       }
@@ -124,6 +126,16 @@ void srt_to_vtt(FILE *in, FILE *out) {
    }
 }
 
+char *get_basename_with_dot(const char *input) {
+   char *s = strdup(input);
+   s = strrchr(s, '/') + 1;
+   char *dot = strrchr(s, '.');
+   dot += 1;
+   *dot = '\0';
+
+   return s;
+}
+
 void touch_output_file(void) {
    if (!filename_output) {
       strcpy(buf, filename_input);
@@ -150,7 +162,12 @@ int main(int argc, char *argv[])
       return 2;
    }
 
-   touch_output_file();
+   if (!filename_output) {
+      char *s = get_basename_with_dot(filename_input);
+      s = strncat(s, extension, 5);
+      filename_output = s;
+      free(s);
+   }
    FILE *f_output = fopen(filename_output, "w");
 
    if (!translate) {
