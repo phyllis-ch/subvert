@@ -3,6 +3,7 @@
 const char *filename_output = NULL;
 char *filename_input = NULL;
 char line[1024];
+char buf[256];
 
 
 void get_flags(int argc, char *argv[]) {
@@ -124,7 +125,6 @@ void srt_to_vtt(FILE *in, FILE *out) {
 }
 
 void touch_output_file(void) {
-   char buf[256];
    if (!filename_output) {
       strcpy(buf, filename_input);
       filename_output = strrchr(buf, '/') + 1;
