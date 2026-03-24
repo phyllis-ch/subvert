@@ -166,7 +166,6 @@ int main(int argc, char *argv[])
       char *s = get_basename_with_dot(filename_input);
       s = strncat(s, extension, 5);
       filename_output = s;
-      free(s);
    }
    FILE *f_output = fopen(filename_output, "w");
 
