@@ -123,6 +123,17 @@ void srt_to_vtt(FILE *in, FILE *out) {
    }
 }
 
+void touch_output_file(void) {
+   char buf[256];
+   if (!filename_output) {
+      strcpy(buf, filename_input);
+      filename_output = strrchr(buf, '/') + 1;
+      char *dot = strrchr(buf, '.');
+      *dot = '\0';
+      strncat(buf, ".lrc", 5);
+   }
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -139,21 +150,13 @@ int main(int argc, char *argv[])
       return 2;
    }
 
-   char buf[256];
-   if (!filename_output) {
-      strcpy(buf, filename_input);
-      filename_output = strrchr(buf, '/') + 1;
-      char *dot = strrchr(buf, '.');
-      *dot = '\0';
-      strncat(buf, ".lrc", 5);
-   }
+   touch_output_file();
    FILE *f_output = fopen(filename_output, "w");
 
    if (!translate) {
       translate = &vtt_to_lrc;
    }
    translate(f_input, f_output);
-
 
    fclose(f_input);
    fclose(f_output);
