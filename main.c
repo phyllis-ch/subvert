@@ -93,13 +93,10 @@ void vtt_to_srt(FILE *in, FILE *out) {
       }
 
       if (strstr(line, "-->")) {
-         fprintf(stdout, "%s", line);
          char *line_ptr = NULL;
          for (int i = 0; i < 2; ++i) {
             line_ptr = strchr(line, '.');
             *line_ptr = ',';
-            fprintf(stdout, "%s\n", line_ptr);
-            fprintf(stdout, "%s\n", line);
          }
          // sscanf(line, "%d:%d:%f", &h, &m, &s);
 
@@ -134,16 +131,6 @@ char *get_basename_with_dot(const char *input) {
    *dot = '\0';
 
    return s;
-}
-
-void touch_output_file(void) {
-   if (!filename_output) {
-      strcpy(buf, filename_input);
-      filename_output = strrchr(buf, '/') + 1;
-      char *dot = strrchr(buf, '.');
-      *dot = '\0';
-      strncat(buf, ".lrc", 5);
-   }
 }
 
 
