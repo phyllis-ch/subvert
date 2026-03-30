@@ -7,6 +7,10 @@ char *filename_input = NULL;
 char line[1024];
 char buf[256];
 
+typedef enum file_format {
+   LRC, SRT, VTT
+} file_format;
+
 // TODO: Support more formats
 // TODO: Add -i flag to read multiple input files from a text file (and maybe from stdin)
 // TODO: Improve the -o flag so no need for specifying extension
@@ -74,6 +78,42 @@ void get_flags(int argc, char *argv[]) {
 
       filename_input = argv[i];
    }
+}
+
+void conversion_match() {
+   // A hashmap would probably be better
+   file_format in, out;
+
+   if (!strcmp(output_extension, "lrc")) {
+      out = LRC;
+   }
+
+   if (!strcmp(output_extension, "srt")) {
+      out = SRT;
+   }
+
+   if (!strcmp(output_extension, "vtt")) {
+      out = VTT;
+   }
+
+   if (!strcmp(input_extension, "lrc")) {
+      in = LRC;
+   }
+
+   if (!strcmp(input_extension, "srt")) {
+      in = SRT;
+   }
+
+   if (!strcmp(input_extension, "vtt")) {
+      in = VTT;
+   }
+
+
+   if (!in || !out) {
+      exit(1);
+   }
+
+   // translate = &function_array[in][out];
 }
 
 void vtt_to_lrc(FILE *in, FILE *out) {
@@ -147,6 +187,7 @@ char *get_basename_with_dot(const char *input) {
    char *dot = strrchr(s, '.');
    dot += 1;
    *dot = '\0';
+   // This gives memory leak, but probably doesnt matter
 
    return s;
 }
