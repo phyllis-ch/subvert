@@ -1,6 +1,4 @@
 #include "subvert.h"
-#include <stdio.h>
-#include <string.h>
 
 const char *filename_output = NULL;
 const char *input_extension = NULL;
