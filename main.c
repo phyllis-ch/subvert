@@ -1,11 +1,25 @@
 #include "subvert.h"
+#include <stdio.h>
+#include <string.h>
 
 const char *filename_output = NULL;
-const char *extension = NULL;
+const char *input_extension = NULL;
+const char *output_extension = NULL;
 char *filename_input = NULL;
 char line[1024];
 char buf[256];
 
+// TODO: Support more formats
+// TODO: Add -i flag to read multiple input files from a text file (and maybe from stdin)
+// TODO: Improve the -o flag so no need for specifying extension
+
+// [input_extension][output_format]
+// matrix of function?
+// function to return first index and second index
+
+void have_extension() {
+
+}
 
 void get_flags(int argc, char *argv[]) {
    if (argc < 2) {
@@ -24,11 +38,16 @@ void get_flags(int argc, char *argv[]) {
          continue;
       }
 
+      if (!strcmp(argv[i], "-if")) {
+         input_extension = argv[++i];
+         continue;
+      }
+
       if (!strcmp(argv[i], "-of")) {
          if (strcmp(argv[i + 1], "lrc") == 0) translate = &vtt_to_lrc;
-         if (strcmp(argv[i + 1], "vtt") == 0) translate = &srt_to_vtt;
          if (strcmp(argv[i + 1], "srt") == 0) translate = &vtt_to_srt;
-         extension = argv[i + 1];
+         if (strcmp(argv[i + 1], "vtt") == 0) translate = &srt_to_vtt;
+         output_extension = argv[i + 1];
          ++i;
          continue;
       }
@@ -107,6 +126,7 @@ void vtt_to_srt(FILE *in, FILE *out) {
    }
 }
 
+// TODO: Fix bug where <feff> is found at start of output file
 void srt_to_vtt(FILE *in, FILE *out) {
    fprintf(out, "WEBVTT\n\n");
    while (fgets(line, sizeof(line), in)) {
@@ -151,7 +171,7 @@ int main(int argc, char *argv[])
 
    if (!filename_output) {
       char *s = get_basename_with_dot(filename_input);
-      s = strncat(s, extension, 5);
+      s = strncat(s, output_extension, 5);
       filename_output = s;
    }
    FILE *f_output = fopen(filename_output, "w");
