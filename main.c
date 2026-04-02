@@ -1,4 +1,5 @@
 #include "subvert.h"
+#include <stdio.h>
 
 const char *filename_output = NULL;
 const char *input_extension = NULL;
@@ -15,11 +16,7 @@ char buf[256];
 // matrix of function?
 // function to return first index and second index
 
-typedef enum {
-   LRC,
-   SRT,
-   VTT
-} sub_fmt;
+typedef enum {LRC, SRT, VTT} sub_fmt;
 
 #define FN_COUNT 3
 typedef void (*fn_ptr)(FILE *, FILE *);
@@ -58,7 +55,7 @@ void get_flags(int argc, char *argv[]) {
       }
 
       if (!strcmp(argv[i], "-h")) {
-         fprintf(stdout, "Usage: %s [-o output] <file>\n", argv[0]);
+         fprintf(stdout, "Usage: %s [-of format] <file>\n", argv[0]);
          exit(0);
       }
 
@@ -185,12 +182,21 @@ void srt_to_lrc(FILE *in, FILE *out) {
 }
 
 sub_fmt get_enum(const char *ext) {
+   // Should probably make an array and loop instead
    if (!strcmp("lrc", ext)) {
       return LRC;
-   } else if (!strcmp("srt", ext)) {
+   }
+   if (!strcmp("srt", ext)) {
       return SRT;
-   } else return VTT;
+   }
+   if (!strcmp("vtt", ext)) {
+      return VTT;  
+   }
+
+   printf("Format not implemented\n");
+   exit(1);
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -204,9 +210,10 @@ int main(int argc, char *argv[])
 
    sub_fmt input_temp = get_enum(input_extension);
    sub_fmt output_temp = get_enum(output_extension);
-   printf("%d\n", input_temp);
-   printf("%d\n", output_temp);
-
+   if (!matrix[input_temp][output_temp]) {
+      printf("Conversion not implemented\n"); 
+      return 1;
+   }
 
    if (!filename_input) {
       fprintf(stderr, "Error: Missing input file\n");
@@ -226,9 +233,7 @@ int main(int argc, char *argv[])
    }
    FILE *f_output = fopen(filename_output, "w");
 
-   if (matrix[input_temp][output_temp]) {
-      matrix[input_temp][output_temp](f_input, f_output);
-   } else printf("urmom\n");
+   matrix[input_temp][output_temp](f_input, f_output);
    
 
    fclose(f_input);
