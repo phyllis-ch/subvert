@@ -15,6 +15,20 @@ char buf[256];
 // matrix of function?
 // function to return first index and second index
 
+typedef enum {
+   LRC,
+   SRT,
+   VTT
+} sub_fmt;
+
+#define FN_COUNT 3
+typedef void (*fn_ptr)(FILE *, FILE *);
+fn_ptr matrix[FN_COUNT][FN_COUNT] = {
+   {NULL, NULL ,NULL },
+   {srt_to_lrc, NULL, srt_to_vtt},
+   {vtt_to_lrc, vtt_to_srt, NULL},
+};
+
 void get_flags(int argc, char *argv[]) {
    if (argc < 2) {
       fprintf(stderr, "Usage: %s [-o output] <file>\n", argv[0]);
@@ -39,9 +53,9 @@ void get_flags(int argc, char *argv[]) {
 
       if (!strcmp(argv[i], "-of")) {
          // if (strcmp(argv[i + 1], "lrc") == 0) translate = &vtt_to_lrc;
-         if (strcmp(argv[i + 1], "lrc") == 0) translate = &srt_to_lrc;
-         if (strcmp(argv[i + 1], "srt") == 0) translate = &vtt_to_srt;
-         if (strcmp(argv[i + 1], "vtt") == 0) translate = &srt_to_vtt;
+         // if (strcmp(argv[i + 1], "lrc") == 0) translate = &srt_to_lrc;
+         // if (strcmp(argv[i + 1], "srt") == 0) translate = &vtt_to_srt;
+         // if (strcmp(argv[i + 1], "vtt") == 0) translate = &srt_to_vtt;
          output_extension = argv[i + 1];
          ++i;
          continue;
@@ -174,10 +188,29 @@ void srt_to_lrc(FILE *in, FILE *out) {
    }
 }
 
+sub_fmt get_enum(const char *ext) {
+   if (!strcmp("lrc", ext)) {
+      return LRC;
+   } else if (!strcmp("srt", ext)) {
+      return SRT;
+   } else return VTT;
+}
 
 int main(int argc, char *argv[])
 {
    get_flags(argc, argv);
+
+   if (!input_extension) {
+      char *s = strdup(filename_input);
+      s = strrchr(s, '.') + 1;
+      input_extension = s;
+   }
+
+   sub_fmt input_temp = get_enum(input_extension);
+   sub_fmt output_temp = get_enum(output_extension);
+   printf("%d\n", input_temp);
+   printf("%d\n", output_temp);
+
 
    if (!filename_input) {
       fprintf(stderr, "Error: Missing input file\n");
@@ -197,10 +230,14 @@ int main(int argc, char *argv[])
    }
    FILE *f_output = fopen(filename_output, "w");
 
-   if (!translate) {
-      translate = &vtt_to_lrc;
-   }
-   translate(f_input, f_output);
+   // if (!translate) {
+   //    translate = &vtt_to_lrc;
+   // }
+   // translate(f_input, f_output);
+   if (matrix[input_temp][output_temp]) {
+      matrix[input_temp][output_temp](f_input, f_output);
+   } else printf("urmom\n");
+   
 
    fclose(f_input);
    fclose(f_output);
