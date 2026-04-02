@@ -38,7 +38,8 @@ void get_flags(int argc, char *argv[]) {
       }
 
       if (!strcmp(argv[i], "-of")) {
-         if (strcmp(argv[i + 1], "lrc") == 0) translate = &vtt_to_lrc;
+         // if (strcmp(argv[i + 1], "lrc") == 0) translate = &vtt_to_lrc;
+         if (strcmp(argv[i + 1], "lrc") == 0) translate = &srt_to_lrc;
          if (strcmp(argv[i + 1], "srt") == 0) translate = &vtt_to_srt;
          if (strcmp(argv[i + 1], "vtt") == 0) translate = &srt_to_vtt;
          output_extension = argv[i + 1];
@@ -70,6 +71,16 @@ void get_flags(int argc, char *argv[]) {
 
       filename_input = argv[i];
    }
+}
+
+char *get_basename_with_dot(const char *input) {
+   char *s = strdup(input);
+   s = strrchr(s, '/') + 1;
+   char *dot = strrchr(s, '.');
+   dot += 1;
+   *dot = '\0';
+
+   return s;
 }
 
 void vtt_to_lrc(FILE *in, FILE *out) {
@@ -137,14 +148,30 @@ void srt_to_vtt(FILE *in, FILE *out) {
    }
 }
 
-char *get_basename_with_dot(const char *input) {
-   char *s = strdup(input);
-   s = strrchr(s, '/') + 1;
-   char *dot = strrchr(s, '.');
-   dot += 1;
-   *dot = '\0';
+void srt_to_lrc(FILE *in, FILE *out) {
+   int h, m;
+   float s, ms;
 
-   return s;
+   // For some reason, the first number (1) skips the following check
+   // This is a workaround until I figure out why
+   fgets(line, sizeof(line), in);
+   while (fgets(line, sizeof(line), in)) {
+      if (isdigit(line[0]) && !strchr(line, ':')) continue;
+
+      if (strstr(line, "-->")) {
+         // if (sscanf(line, "%d:%d:%f,%f", &h, &m, &s, &ms) != 3) {
+         //    h = 0;
+         //    sscanf(line, "%d:%f", &m, &s);
+         // }
+         sscanf(line, "%d:%d:%f,%f", &h, &m, &s, &ms);
+
+         s += ms / 1000;
+         m += h * 60;
+         fprintf(out, "[%d:%.2f]", m, s);
+      } else {
+         fprintf(out, "%s", line);
+      }
+   }
 }
 
 
