@@ -15,10 +15,6 @@ char buf[256];
 // matrix of function?
 // function to return first index and second index
 
-void have_extension() {
-
-}
-
 void get_flags(int argc, char *argv[]) {
    if (argc < 2) {
       fprintf(stderr, "Usage: %s [-o output] <file>\n", argv[0]);

@@ -12,4 +12,4 @@ void vtt_to_srt(FILE *in, FILE *out);
 void srt_to_vtt(FILE *in, FILE *out);
 
 // Function Pointers
-void (*translate)(FILE *, FILE *) = NULL;
+extern void (*translate)(FILE *, FILE *);
