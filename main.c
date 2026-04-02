@@ -52,10 +52,6 @@ void get_flags(int argc, char *argv[]) {
       }
 
       if (!strcmp(argv[i], "-of")) {
-         // if (strcmp(argv[i + 1], "lrc") == 0) translate = &vtt_to_lrc;
-         // if (strcmp(argv[i + 1], "lrc") == 0) translate = &srt_to_lrc;
-         // if (strcmp(argv[i + 1], "srt") == 0) translate = &vtt_to_srt;
-         // if (strcmp(argv[i + 1], "vtt") == 0) translate = &srt_to_vtt;
          output_extension = argv[i + 1];
          ++i;
          continue;
@@ -230,10 +226,6 @@ int main(int argc, char *argv[])
    }
    FILE *f_output = fopen(filename_output, "w");
 
-   // if (!translate) {
-   //    translate = &vtt_to_lrc;
-   // }
-   // translate(f_input, f_output);
    if (matrix[input_temp][output_temp]) {
       matrix[input_temp][output_temp](f_input, f_output);
    } else printf("urmom\n");
