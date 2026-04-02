@@ -2,4 +2,4 @@
 
 set -xe
 
-cc -Wall -Wextra -o subvert main.c subvert.c
+cc -Wall -Wextra -o subvert main.c
