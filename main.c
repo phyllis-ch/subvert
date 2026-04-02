@@ -56,6 +56,11 @@ void get_flags(int argc, char *argv[]) {
 
       if (!strcmp(argv[i], "-h")) {
          fprintf(stdout, "Usage: %s [-of format] <file>\n", argv[0]);
+         fprintf(stdout, "Options: \n");
+         fprintf(stdout, "  -h              show this help message and exit\n");
+         fprintf(stdout, "  -if             specify input file format\n");
+         fprintf(stdout, "  -of             specify output file format\n");
+         fprintf(stdout, "  -o              specify output file\n");
          exit(0);
       }
 
