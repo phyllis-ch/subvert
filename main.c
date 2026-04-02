@@ -1,5 +1,4 @@
 #include "subvert.h"
-#include <stdio.h>
 
 const char *filename_output = NULL;
 const char *input_extension = NULL;
@@ -216,7 +215,7 @@ int main(int argc, char *argv[])
    sub_fmt input_temp = get_enum(input_extension);
    sub_fmt output_temp = get_enum(output_extension);
    if (!matrix[input_temp][output_temp]) {
-      printf("Conversion not implemented\n"); 
+      printf("Conversion not implemented\n");
       return 1;
    }
 
