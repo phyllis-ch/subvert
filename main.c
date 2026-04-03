@@ -3,7 +3,7 @@
 const char *output_filename  = NULL;
 const char *input_extension  = NULL;
 const char *output_extension = NULL;
-char       *input_filename   = NULL;
+const char *input_filename   = NULL;
 
 char line[1024];
 char buf[256];
@@ -74,7 +74,7 @@ void get_flags(int argc, char *argv[]) {
       if (argv[i][0] == '-' && argv[i][1] != '\0') {
          fprintf(stderr, "Usage: %s [-o output] file\n", argv[0]);
          fprintf(stderr, "Unknown option '%c'\n", argv[i][1]);
-         exit(2);
+         exit(1);
       }
 
       input_filename = argv[i];
@@ -220,8 +220,8 @@ int main(int argc, char *argv[])
       fprintf(stderr, "Error: Missing input file\n");
       return 2;
    }
-
    FILE *f_input = fopen(input_filename, "r");
+
    if (!f_input) {
       fprintf(stderr, "Error: filename %s cannot be opened\n", input_filename);
       return 2;
@@ -233,6 +233,11 @@ int main(int argc, char *argv[])
       output_filename = s;
    }
    FILE *f_output = fopen(output_filename, "w");
+
+   if (!f_output) {
+      fprintf(stderr, "Error: filename %s cannot be opened\n", output_filename);
+      return 2;
+   }
 
    // Main loop
    matrix[input_temp][output_temp](f_input, f_output);
