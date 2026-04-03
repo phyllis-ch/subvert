@@ -11,7 +11,7 @@ As in **Sub**title con**Vert**er
 
 ## Usage
 ```
-subvert [-o output ] input.{vtt,srt}
+subvert [ -of {lrc,srt,vtt} ] input.{vtt,srt}
 ```
 
 ## Supported format conversion (Not fully compatible yet)
