@@ -1,29 +1,27 @@
 #include "subvert.h"
 
-const char *filename_output = NULL;
-const char *input_extension = NULL;
+const char *output_filename  = NULL;
+const char *input_extension  = NULL;
 const char *output_extension = NULL;
-char *filename_input = NULL;
+char       *input_filename   = NULL;
+
 char line[1024];
 char buf[256];
 
+typedef enum {LRC, SRT, VTT , FN_COUNT} sub_fmt;
+
 // TODO: Support more formats
+typedef void (*fn_ptr)(FILE *, FILE *);
+fn_ptr matrix[FN_COUNT][FN_COUNT] = {
+   // [input_extension][output_format]
+   {NULL,       NULL,       NULL      },
+   {srt_to_lrc, NULL,       srt_to_vtt},
+   {vtt_to_lrc, vtt_to_srt, NULL      },
+};
+
 // TODO: Add -i flag to read multiple input files from a text file (and maybe from stdin)
 // TODO: Improve the -o flag so no need for specifying extension
 
-// [input_extension][output_format]
-// matrix of function?
-// function to return first index and second index
-
-typedef enum {LRC, SRT, VTT} sub_fmt;
-
-#define FN_COUNT 3
-typedef void (*fn_ptr)(FILE *, FILE *);
-fn_ptr matrix[FN_COUNT][FN_COUNT] = {
-   {NULL, NULL ,NULL },
-   {srt_to_lrc, NULL, srt_to_vtt},
-   {vtt_to_lrc, vtt_to_srt, NULL},
-};
 
 void get_flags(int argc, char *argv[]) {
    if (argc < 2) {
@@ -38,7 +36,7 @@ void get_flags(int argc, char *argv[]) {
             fprintf(stderr, "Error: -o requires an argument\n");
             exit(1);
          }
-         filename_output = argv[++i];
+         output_filename = argv[++i];
          continue;
       }
 
@@ -48,8 +46,7 @@ void get_flags(int argc, char *argv[]) {
       }
 
       if (!strcmp(argv[i], "-of")) {
-         output_extension = argv[i + 1];
-         ++i;
+         output_extension = argv[++i];
          continue;
       }
 
@@ -64,7 +61,7 @@ void get_flags(int argc, char *argv[]) {
       }
 
       if (!strcmp(argv[i], "--")) {
-         filename_input = argv[++i];
+         input_filename = argv[++i];
          break;
       }
 
@@ -80,7 +77,7 @@ void get_flags(int argc, char *argv[]) {
          exit(2);
       }
 
-      filename_input = argv[i];
+      input_filename = argv[i];
    }
 }
 
@@ -207,7 +204,7 @@ int main(int argc, char *argv[])
    get_flags(argc, argv);
 
    if (!input_extension) {
-      char *s = strdup(filename_input);
+      char *s = strdup(input_filename);
       s = strrchr(s, '.') + 1;
       input_extension = s;
    }
@@ -219,27 +216,26 @@ int main(int argc, char *argv[])
       return 1;
    }
 
-   if (!filename_input) {
+   if (!input_filename) {
       fprintf(stderr, "Error: Missing input file\n");
       return 2;
    }
 
-   FILE *f_input = fopen(filename_input, "r");
+   FILE *f_input = fopen(input_filename, "r");
    if (!f_input) {
-      fprintf(stderr, "Error: filename %s cannot be opened\n", filename_input);
+      fprintf(stderr, "Error: filename %s cannot be opened\n", input_filename);
       return 2;
    }
 
-   if (!filename_output) {
-      char *s = get_basename_with_dot(filename_input);
+   if (!output_filename) {
+      char *s = get_basename_with_dot(input_filename);
       s = strncat(s, output_extension, 5);
-      filename_output = s;
+      output_filename = s;
    }
-   FILE *f_output = fopen(filename_output, "w");
+   FILE *f_output = fopen(output_filename, "w");
 
+   // Main loop
    matrix[input_temp][output_temp](f_input, f_output);
-   
-
    fclose(f_input);
    fclose(f_output);
 
