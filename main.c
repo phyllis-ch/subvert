@@ -1,9 +1,9 @@
 #include "subvert.h"
 
+const char *input_filename   = NULL;
 const char *output_filename  = NULL;
 const char *input_extension  = NULL;
 const char *output_extension = NULL;
-const char *input_filename   = NULL;
 
 char line[1024];
 char buf[256];
@@ -209,9 +209,9 @@ int main(int argc, char *argv[])
       input_extension = s;
    }
 
-   sub_fmt input_temp = get_enum(input_extension);
-   sub_fmt output_temp = get_enum(output_extension);
-   if (!matrix[input_temp][output_temp]) {
+   sub_fmt input_fmt = get_enum(input_extension);
+   sub_fmt output_fmt = get_enum(output_extension);
+   if (!matrix[input_fmt][output_fmt]) {
       printf("Conversion not implemented\n");
       return 1;
    }
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
    }
 
    // Main loop
-   matrix[input_temp][output_temp](f_input, f_output);
+   matrix[input_fmt][output_fmt](f_input, f_output);
    fclose(f_input);
    fclose(f_output);
 
