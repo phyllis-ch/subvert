@@ -6,7 +6,6 @@ const char *input_extension  = NULL;
 const char *output_extension = NULL;
 
 char line[1024];
-char buf[256];
 
 typedef enum {LRC, SRT, VTT , FN_COUNT} sub_fmt;
 
