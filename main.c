@@ -1,7 +1,5 @@
 #include "subvert.h"
 
-const char *input_filename   = NULL;
-const char *output_filename  = NULL;
 const char *input_extension  = NULL;
 const char *output_extension = NULL;
 
@@ -45,7 +43,7 @@ void get_flags(int argc, char *argv[]) {
             fprintf(stderr, "Error: -o requires an argument\n");
             exit(1);
          }
-         output_filename = argv[++i];
+         output.filename = argv[++i];
          continue;
       }
 
@@ -70,7 +68,7 @@ void get_flags(int argc, char *argv[]) {
       }
 
       if (!strcmp(argv[i], "--")) {
-         input_filename = argv[++i];
+         input.filename = argv[++i];
          break;
       }
 
@@ -86,7 +84,7 @@ void get_flags(int argc, char *argv[]) {
          exit(1);
       }
 
-      input_filename = argv[i];
+      input.filename = argv[i];
    }
 }
 
@@ -213,7 +211,7 @@ int main(int argc, char *argv[])
    get_flags(argc, argv);
 
    if (!input_extension) {
-      char *s = strdup(input_filename);
+      char *s = strdup(input.filename);
       s = strrchr(s, '.') + 1;
       input_extension = s;
    }
@@ -225,26 +223,26 @@ int main(int argc, char *argv[])
       return 1;
    }
 
-   if (!input_filename) {
+   if (!input.filename) {
       fprintf(stderr, "Error: Missing input file\n");
       return 2;
    }
-   FILE *f_input = fopen(input_filename, "r");
+   FILE *f_input = fopen(input.filename, "r");
 
    if (!f_input) {
-      fprintf(stderr, "Error: filename %s cannot be opened\n", input_filename);
+      fprintf(stderr, "Error: filename %s cannot be opened\n", input.filename);
       return 2;
    }
 
-   if (!output_filename) {
-      char *s = get_basename_with_dot(input_filename);
+   if (!output.filename) {
+      char *s = get_basename_with_dot(input.filename);
       s = strncat(s, output_extension, 5);
-      output_filename = s;
+      output.filename = s;
    }
-   FILE *f_output = fopen(output_filename, "w");
+   FILE *f_output = fopen(output.filename, "w");
 
    if (!f_output) {
-      fprintf(stderr, "Error: filename %s cannot be opened\n", output_filename);
+      fprintf(stderr, "Error: filename %s cannot be opened\n", output.filename);
       return 2;
    }
 
