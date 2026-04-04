@@ -7,6 +7,16 @@ const char *output_extension = NULL;
 
 char line[1024];
 
+File input = {
+   .extension = NULL,
+   .filename  = NULL,
+};
+
+File output = {
+   .extension = NULL,
+   .filename  = NULL,
+};
+
 typedef enum {LRC, SRT, VTT , FN_COUNT} sub_fmt;
 
 // TODO: Support more formats
