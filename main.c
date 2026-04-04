@@ -1,8 +1,5 @@
 #include "subvert.h"
 
-const char *input_extension  = NULL;
-const char *output_extension = NULL;
-
 char line[1024];
 
 File input = {
@@ -20,7 +17,7 @@ typedef enum {LRC, SRT, VTT , FN_COUNT} sub_fmt;
 // TODO: Support more formats
 typedef void (*fn_ptr)(FILE *, FILE *);
 fn_ptr matrix[FN_COUNT][FN_COUNT] = {
-   // [input_extension][output_format]
+   // [input.extension][output.extension]
    {NULL,       NULL,       NULL      },
    {srt_to_lrc, NULL,       srt_to_vtt},
    {vtt_to_lrc, vtt_to_srt, NULL      },
@@ -48,12 +45,12 @@ void get_flags(int argc, char *argv[]) {
       }
 
       if (!strcmp(argv[i], "-if")) {
-         input_extension = argv[++i];
+         input.extension = argv[++i];
          continue;
       }
 
       if (!strcmp(argv[i], "-of")) {
-         output_extension = argv[++i];
+         output.extension = argv[++i];
          continue;
       }
 
@@ -210,14 +207,14 @@ int main(int argc, char *argv[])
 {
    get_flags(argc, argv);
 
-   if (!input_extension) {
+   if (!input.extension) {
       char *s = strdup(input.filename);
       s = strrchr(s, '.') + 1;
-      input_extension = s;
+      input.extension = s;
    }
 
-   sub_fmt input_fmt = get_enum(input_extension);
-   sub_fmt output_fmt = get_enum(output_extension);
+   sub_fmt input_fmt = get_enum(input.extension);
+   sub_fmt output_fmt = get_enum(output.extension);
    if (!matrix[input_fmt][output_fmt]) {
       printf("Conversion not implemented\n");
       return 1;
@@ -236,7 +233,7 @@ int main(int argc, char *argv[])
 
    if (!output.filename) {
       char *s = get_basename_with_dot(input.filename);
-      s = strncat(s, output_extension, 5);
+      s = strncat(s, output.extension, 5);
       output.filename = s;
    }
    FILE *f_output = fopen(output.filename, "w");
