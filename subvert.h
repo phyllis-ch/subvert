@@ -3,6 +3,10 @@
 #include <string.h>
 #include <ctype.h>
 
+typedef void (*fn_ptr)(FILE *, FILE *);
+
+typedef enum {LRC, SRT, VTT , FN_COUNT} sub_fmt;
+
 // File struct
 typedef struct {
    const char *filename;

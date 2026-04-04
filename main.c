@@ -12,20 +12,16 @@ File output = {
    .filename  = NULL,
 };
 
-typedef enum {LRC, SRT, VTT , FN_COUNT} sub_fmt;
-
 // TODO: Support more formats
-typedef void (*fn_ptr)(FILE *, FILE *);
 fn_ptr matrix[FN_COUNT][FN_COUNT] = {
-   // [input.extension][output.extension]
    {NULL,       NULL,       NULL      },
    {srt_to_lrc, NULL,       srt_to_vtt},
    {vtt_to_lrc, vtt_to_srt, NULL      },
 };
 
+
 // TODO: Add -i flag to read multiple input files from a text file (and maybe from stdin)
 // TODO: Improve the -o flag so no need for specifying extension
-
 
 void get_flags(int argc, char *argv[]) {
    if (argc < 2) {
